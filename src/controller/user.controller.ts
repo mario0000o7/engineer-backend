@@ -1,24 +1,62 @@
 import { Request, Response } from 'express'
 import UserRepository from '../repositories/user.repository'
-import { Error } from 'sequelize'
+import { DataBaseError } from './user.controller.types'
+import bcrypt from 'bcrypt'
+import { generateTokenJwt } from '../services/authService'
 
 export default class UserController {
-  async create(req: Request, res: Response) {
+  async register(req: Request, res: Response) {
     const payload = req.body
 
     try {
       const result = await UserRepository.save(payload)
+      const jwtToken = generateTokenJwt(result)
 
-      return res.status(200).send(result)
+      return res.status(200).send({
+        token: jwtToken
+      })
     } catch (err) {
-      if (err instanceof Error && err.name === 'SequelizeUniqueConstraintError') {
-        console.log(err.message)
-        return res.status(409).json({
-          message: 'User already exists'
-        })
+      const error = err as DataBaseError
+      switch (error.errors![0].message) {
+        case 'username must be unique':
+          return res.status(400).send('username already exists')
+        case 'phone must be unique':
+          return res.status(400).send('phone already exists')
+        case 'email must be unique':
+          return res.status(400).send('email already exists')
+        case 'uuid must be unique':
+          return res.status(400).send('uuid already exists')
+        default:
+          return res.status(500).send('something went wrong')
       }
-      return res.status(500).json(err)
     }
+  }
+
+  async login(req: Request, res: Response) {
+    const payload = req.body
+    let result
+    try {
+      result = await UserRepository.retrieveByMail(payload.email)
+    } catch (err) {
+      return res.status(400).send('invalid credentials')
+    }
+    if (result === null) {
+      return res.status(400).send('user not found')
+    }
+    let isMatch = false
+    try {
+      isMatch = bcrypt.compareSync(payload.password, result.password)
+    } catch (err) {
+      return res.status(400).send('invalid credentials')
+    }
+
+    if (!isMatch) {
+      return res.status(400).send('invalid credentials')
+    }
+    const jwtToken = generateTokenJwt(result)
+    return res.status(200).send({
+      token: jwtToken
+    })
   }
 
   async update(req: Request, res: Response) {
