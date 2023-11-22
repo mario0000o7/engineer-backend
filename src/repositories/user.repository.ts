@@ -21,6 +21,9 @@ interface IUserRepository {
 
 class UserRepository implements IUserRepository {
   async save(User1: User): Promise<User> {
+    User1.phone = User1.phone.replace(/\s/g, '')
+    User1.email = User1.email.toLowerCase()
+    User1.email = User1.email.replace(/\s/g, '')
     return await User.create(User1)
   }
 
@@ -72,6 +75,8 @@ class UserRepository implements IUserRepository {
   }
 
   async retrieveByMail(UserMail: string): Promise<User | null> {
+    UserMail = UserMail.toLowerCase()
+    UserMail = UserMail.replace(/\s/g, '')
     return await User.findOne({
       where: {
         email: UserMail
