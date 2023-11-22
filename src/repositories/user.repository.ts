@@ -12,8 +12,6 @@ interface IUserRepository {
 
   retrieveByPhone(UserPhone: string): Promise<User | null>
 
-  retrieveByUsername(UserUsername: string): Promise<User | null>
-
   update(User: User): Promise<number>
 
   delete(UserId: number): Promise<number>

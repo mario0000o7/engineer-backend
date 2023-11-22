@@ -58,6 +58,12 @@ export class User extends Model<User> {
     unique: true
   })
   uuid!: string
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+    unique: false
+  })
+  birthDate!: Date
 }
 
 export default User
