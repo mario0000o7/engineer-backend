@@ -93,8 +93,9 @@ export default class UserController {
   }
 
   async findByMail(req: Request, res: Response) {
-    const email = req.body.email
     try {
+      const email = req.body.email
+
       const result = await UserRepository.retrieveByMail(email)
       return res.status(200).send({ userExists: result !== null })
     } catch (err) {
@@ -103,8 +104,9 @@ export default class UserController {
   }
 
   async findByPhone(req: Request, res: Response) {
-    const phone = req.body.phone
     try {
+      const phone = req.body.phone
+
       const result = await UserRepository.retrieveByPhone(phone)
       return res.status(200).send({ userExists: result !== null })
     } catch (err) {

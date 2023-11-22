@@ -77,6 +77,7 @@ class UserRepository implements IUserRepository {
   async retrieveByMail(UserMail: string): Promise<User | null> {
     UserMail = UserMail.toLowerCase()
     UserMail = UserMail.replace(/\s/g, '')
+    console.log(UserMail)
     return await User.findOne({
       where: {
         email: UserMail
@@ -85,6 +86,7 @@ class UserRepository implements IUserRepository {
   }
 
   async retrieveByPhone(UserPhone: string): Promise<User | null> {
+    UserPhone = UserPhone.replace(/\s/g, '')
     return await User.findOne({
       where: {
         phone: UserPhone
