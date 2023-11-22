@@ -66,19 +66,19 @@ export default class UserController {
   }
 
   async findAll(req: Request, res: Response) {
-    const filters: string = req.params.fullName as string
+    const filters: string = req.body.fullName as string
     const results = await UserRepository.retrieveAll({ fullName: filters })
     return res.status(200).send(results)
   }
 
   async findById(req: Request, res: Response) {
-    const id = Number(req.params.id)
+    const id = Number(req.body.id)
     const result = await UserRepository.retrieveById(id)
     return res.status(200).send(result)
   }
 
   async deleteById(req: Request, res: Response) {
-    const id = Number(req.params.id)
+    const id = Number(req.body.id)
     const result = await UserRepository.delete(id)
     return res.status(204).send({
       success: result
@@ -93,7 +93,7 @@ export default class UserController {
   }
 
   async findByMail(req: Request, res: Response) {
-    const email = req.params.email
+    const email = req.body.email
     try {
       const result = await UserRepository.retrieveByMail(email)
       return res.status(200).send({ userExists: result !== null })
@@ -103,7 +103,7 @@ export default class UserController {
   }
 
   async findByPhone(req: Request, res: Response) {
-    const phone = req.params.phone
+    const phone = req.body.phone
     try {
       const result = await UserRepository.retrieveByPhone(phone)
       return res.status(200).send({ userExists: result !== null })
