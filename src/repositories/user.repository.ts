@@ -88,14 +88,6 @@ class UserRepository implements IUserRepository {
       }
     })
   }
-
-  async retrieveByUsername(UserUsername: string): Promise<User | null> {
-    return await User.findOne({
-      where: {
-        username: UserUsername
-      }
-    })
-  }
 }
 
 export default new UserRepository()

@@ -103,10 +103,4 @@ export default class UserController {
     const result = await UserRepository.retrieveByPhone(phone)
     return res.status(200).send({ userExists: result !== null })
   }
-
-  async findByUsername(req: Request, res: Response) {
-    const username = req.params.username
-    const result = await UserRepository.retrieveByUsername(username)
-    return res.status(200).send(result)
-  }
 }
