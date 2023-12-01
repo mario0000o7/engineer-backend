@@ -67,7 +67,13 @@ export default class UserController {
 
   async findAll(req: Request, res: Response) {
     const filters: string = req.body.fullName as string
-    const results = await UserRepository.retrieveAll({ fullName: filters })
+    const role: number = req.body.role as number
+    let results
+    try {
+      results = await UserRepository.retrieveAll({ fullName: filters, role: role })
+    } catch (err) {
+      return res.status(400).send('invalid filters')
+    }
     return res.status(200).send(results)
   }
 
