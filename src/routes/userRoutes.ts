@@ -16,6 +16,7 @@ class UserRoutes {
     this.router.post('/checkEmail', this.userController.findByMail)
     this.router.post('/checkPhone', this.userController.findByPhone)
     this.router.post('/findUser', this.userController.findAll)
+    this.router.get('/getAllDoctors', this.userController.getAllDoctors)
   }
 }
 

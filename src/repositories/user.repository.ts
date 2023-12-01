@@ -12,6 +12,8 @@ interface IUserRepository {
 
   retrieveByPhone(UserPhone: string): Promise<User | null>
 
+  retrieveAllByRole(role: number): Promise<User[]>
+
   update(User: User): Promise<number>
 
   delete(UserId: number): Promise<number>
@@ -29,6 +31,14 @@ class UserRepository implements IUserRepository {
 
   async retrieveById(UserId: number): Promise<User | null> {
     return await User.findByPk(UserId)
+  }
+
+  async retrieveAllByRole(role: number): Promise<User[]> {
+    return await User.findAll({
+      where: {
+        role: role
+      }
+    })
   }
 
   async update(User1: User): Promise<number> {

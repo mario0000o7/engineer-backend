@@ -77,6 +77,17 @@ export default class UserController {
     return res.status(200).send(results)
   }
 
+  async getAllDoctors(req: Request, res: Response) {
+    const role: number = 1
+    let results
+    try {
+      results = await UserRepository.retrieveAllByRole(role)
+    } catch (err) {
+      return res.status(400).send('invalid filters')
+    }
+    return res.status(200).send(results)
+  }
+
   async findById(req: Request, res: Response) {
     const id = Number(req.body.id)
     const result = await UserRepository.retrieveById(id)
