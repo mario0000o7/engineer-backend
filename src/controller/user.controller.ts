@@ -24,8 +24,6 @@ export default class UserController {
           return res.status(400).send('phone already exists')
         case 'email must be unique':
           return res.status(400).send('email already exists')
-        case 'uuid must be unique':
-          return res.status(400).send('uuid already exists')
         default: {
           console.log(err)
           return res.status(500).send('something went wrong')

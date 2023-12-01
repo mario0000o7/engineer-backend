@@ -5,8 +5,7 @@ export function generateTokenJwt(user: User) {
   return jwt.sign(
     {
       id: user.id,
-      email: user.email,
-      uuid: user.uuid
+      email: user.email
     },
     process.env.TOKEN_SECRET as string,
     { expiresIn: '30d' }

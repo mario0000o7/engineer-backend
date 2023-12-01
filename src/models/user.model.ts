@@ -53,12 +53,6 @@ export class User extends Model<User> {
   })
   avatarImg!: string
   @Column({
-    type: DataType.STRING,
-    allowNull: false,
-    unique: true
-  })
-  uuid!: string
-  @Column({
     type: DataType.DATE,
     allowNull: false,
     unique: false
