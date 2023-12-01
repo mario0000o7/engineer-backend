@@ -35,6 +35,7 @@ class UserRepository implements IUserRepository {
 
   async retrieveAllByRole(role: number): Promise<User[]> {
     return await User.findAll({
+      attributes: ['id', 'firstName', 'lastName', 'email', 'phone', 'role', 'avatarImg', 'birthDate'],
       where: {
         role: role
       }
