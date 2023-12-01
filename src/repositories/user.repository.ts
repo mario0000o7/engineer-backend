@@ -49,10 +49,10 @@ class UserRepository implements IUserRepository {
     const [searchByFirstName, searchByLastName] = fullName.split(' ')
     return await User.findAll({
       where: {
-        first_name: {
+        firstName: {
           [Op.like]: searchByFirstName
         },
-        last_name: {
+        lastName: {
           [Op.like]: searchByLastName
         }
       }

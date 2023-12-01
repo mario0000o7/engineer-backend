@@ -20,12 +20,12 @@ export class User extends Model<User> {
     type: DataType.STRING,
     allowNull: false
   })
-  first_name!: string
+  firstName!: string
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
-  last_name!: string
+  lastName!: string
 
   @Column({
     type: DataType.STRING,
@@ -51,7 +51,7 @@ export class User extends Model<User> {
     allowNull: true,
     unique: false
   })
-  avatar_img!: string
+  avatarImg!: string
   @Column({
     type: DataType.STRING,
     allowNull: false,
