@@ -6,11 +6,11 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-// function errorHandler(request: Request, response: Response) {
-//   response.status(500).json({
-//     message: 'Something went wrong'
-//   })
-// }
+function errorHandler(request: Request, response: Response) {
+  response.status(500).json({
+    message: 'Something went wrong'
+  })
+}
 
 export default class Server {
   constructor(app: Application) {
