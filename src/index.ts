@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express'
+import express, { Application } from 'express'
 import cors, { CorsOptions } from 'cors'
 import Routes from './routes'
 import Database from './db'
@@ -6,11 +6,11 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-function errorHandler(request: Request, response: Response) {
-  response.status(500).json({
-    message: 'Something went wrong'
-  })
-}
+// function errorHandler(request: Request, response: Response) {
+//   response.status(500).json({
+//     message: 'Something went wrong'
+//   })
+// }
 
 export default class Server {
   constructor(app: Application) {
