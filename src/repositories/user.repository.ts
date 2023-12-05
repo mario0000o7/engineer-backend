@@ -114,6 +114,7 @@ class UserRepository implements IUserRepository {
 
   async retrieveByIds(ids: number[]): Promise<User[]> {
     return await User.findAll({
+      attributes: ['id', 'firstName', 'lastName', 'email', 'phone', 'role', 'avatarImg', 'birthDate'],
       where: {
         id: ids
       }
