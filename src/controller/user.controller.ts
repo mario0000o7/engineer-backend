@@ -88,10 +88,15 @@ export default class UserController {
     return res.status(200).send(results)
   }
 
-  async findById(req: Request, res: Response) {
-    const id = Number(req.body.id)
-    const result = await UserRepository.retrieveById(id)
-    return res.status(200).send(result)
+  async findByIds(req: Request, res: Response) {
+    const ids: number[] = req.body.ids
+    let results
+    try {
+      results = await UserRepository.retrieveByIds(ids)
+    } catch (err) {
+      return res.status(400).send('invalid filters')
+    }
+    return res.status(200).send(results)
   }
 
   async deleteById(req: Request, res: Response) {

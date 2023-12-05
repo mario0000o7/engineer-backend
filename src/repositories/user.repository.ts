@@ -111,6 +111,14 @@ class UserRepository implements IUserRepository {
       }
     })
   }
+
+  async retrieveByIds(ids: number[]): Promise<User[]> {
+    return await User.findAll({
+      where: {
+        id: ids
+      }
+    })
+  }
 }
 
 export default new UserRepository()
