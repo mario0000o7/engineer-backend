@@ -86,7 +86,7 @@ export default class UserController {
     } catch (err) {
       return res.status(400).send('invalid filters')
     }
-    return res.status(200).send(results)
+    return res.status(200).send(results.reverse())
   }
 
   async findByIds(req: Request, res: Response) {
@@ -104,7 +104,7 @@ export default class UserController {
         sortedResults.push(result)
       }
     }
-    return res.status(200).send(sortedResults)
+    return res.status(200).send(sortedResults.reverse())
   }
 
   async deleteById(req: Request, res: Response) {
