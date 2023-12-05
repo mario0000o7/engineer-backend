@@ -3,6 +3,7 @@ import UserRepository from '../repositories/user.repository'
 import { DataBaseError } from './user.controller.types'
 import bcrypt from 'bcrypt'
 import { generateTokenJwt } from '../services/authService'
+import User from '../models/user.model'
 
 export default class UserController {
   async register(req: Request, res: Response) {
@@ -96,7 +97,14 @@ export default class UserController {
     } catch (err) {
       return res.status(400).send('invalid filters')
     }
-    return res.status(200).send(results)
+    const sortedResults: User[] = []
+    for (let i = 0; i < ids.length; i++) {
+      const result = results.find((value) => value.id === ids[i])
+      if (result) {
+        sortedResults.push(result)
+      }
+    }
+    return res.status(200).send(sortedResults)
   }
 
   async deleteById(req: Request, res: Response) {
