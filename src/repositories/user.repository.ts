@@ -58,7 +58,7 @@ class UserRepository implements IUserRepository {
   async retrieveAll(searchParams: { fullName: string; role: number }): Promise<User[]> {
     const { fullName, role } = searchParams
     return await User.findAll({
-      attributes: ['id', 'firstName', 'lastName', 'email', 'phone', 'role', 'avatarImg', 'birthDate'],
+      attributes: ['id', 'firstName', 'lastName', 'email', 'phone', 'role', 'avatarImg', 'birthDate', 'title'],
       where: {
         [Op.or]: [
           {
