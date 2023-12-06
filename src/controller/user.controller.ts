@@ -83,8 +83,8 @@ export default class UserController {
     return res.status(200).send(results)
   }
 
-  async getAllDoctors(req: Request, res: Response) {
-    const role: number = 1
+  async getAllUsers(req: Request, res: Response) {
+    const role: number = req.body.role as number
     let results
     try {
       results = await UserRepository.retrieveAllByRole(role)
