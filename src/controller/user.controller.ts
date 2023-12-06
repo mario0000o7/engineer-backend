@@ -18,17 +18,22 @@ export default class UserController {
       })
     } catch (err) {
       const error = err as DataBaseError
-      switch (error.errors![0].message) {
-        case 'username must be unique':
-          return res.status(400).send('username already exists')
-        case 'phone must be unique':
-          return res.status(400).send('phone already exists')
-        case 'email must be unique':
-          return res.status(400).send('email already exists')
-        default: {
-          console.log(err)
-          return res.status(500).send('something went wrong')
+      try {
+        switch (error.errors![0].message) {
+          case 'username must be unique':
+            return res.status(400).send('username already exists')
+          case 'phone must be unique':
+            return res.status(400).send('phone already exists')
+          case 'email must be unique':
+            return res.status(400).send('email already exists')
+          default: {
+            console.log(err)
+            return res.status(500).send('something went wrong')
+          }
         }
+      } catch (err) {
+        console.log(err)
+        return res.status(500).send('something went wrong')
       }
     }
   }
@@ -129,6 +134,7 @@ export default class UserController {
       const result = await UserRepository.retrieveByMail(email)
       return res.status(200).send({ userExists: result !== null })
     } catch (err) {
+      console.log(err)
       return res.status(400).send('invalid email')
     }
   }
