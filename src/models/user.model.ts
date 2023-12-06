@@ -64,6 +64,42 @@ export class User extends Model<User> {
     unique: false
   })
   gender!: string
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    unique: false
+  })
+  title!: string
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    unique: false
+  })
+  address1!: string
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    unique: false
+  })
+  address2!: string
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    unique: false
+  })
+  city!: string
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    unique: false
+  })
+  country!: string
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    unique: false
+  })
+  postalCode!: string
 }
 
 export default User
