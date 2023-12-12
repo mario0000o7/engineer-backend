@@ -59,8 +59,9 @@ export default class OfficeController {
 
   async retrieveByOwnerId(req: Request, res: Response) {
     const payload = req.body
+    const { ownerId } = payload
     try {
-      const result = await OfficeRepository.retrieveAllByOwnerId(payload)
+      const result = await OfficeRepository.retrieveAllByOwnerId(ownerId)
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)
