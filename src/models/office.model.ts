@@ -54,12 +54,12 @@ export class Office extends Model<Office> {
   })
   ownerId!: number
   @Column({
-    type: DataType.TIME,
+    type: DataType.DATE,
     allowNull: false
   })
   timeFrom!: Date
   @Column({
-    type: DataType.TIME,
+    type: DataType.DATE,
     allowNull: false
   })
   timeTo!: Date

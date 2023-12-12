@@ -73,12 +73,14 @@ class OfficeRepository implements IOfficeRepository {
   }
 
   async update(office: Office): Promise<number> {
+    console.log(office)
     try {
       const result = await Office.update(office, {
         where: {
           id: office.id
         }
       })
+      console.log('result', result)
       return result[0]
     } catch (error) {
       throw new Error('Error while updating office')

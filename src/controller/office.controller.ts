@@ -17,21 +17,23 @@ export default class OfficeController {
     const payload = req.body
     try {
       const result = await OfficeRepository.update(payload)
-      return res.status(200).send(result)
+      return res.status(200).send(result.toString())
     } catch (err) {
+      console.log('Update error')
       console.log(err)
-      return res.status(500).send('something went wrong')
+      return res.status(400).send('something went wrong')
     }
   }
 
   async delete(req: Request, res: Response) {
-    const payload = req.body
+    const payload = req.body.officeId
+    console.log(payload)
     try {
       const result = await OfficeRepository.delete(payload)
-      return res.status(200).send(result)
+      return res.status(200).send(result.toString())
     } catch (err) {
       console.log(err)
-      return res.status(500).send('something went wrong')
+      return res.status(400).send('something went wrong')
     }
   }
 
