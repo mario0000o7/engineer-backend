@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize-typescript'
 import { config, dialect } from '../config/db.config'
 import { User } from '../models/user.model'
+import Office from '../models/office.model'
 
 class Database {
   public sequelize: Sequelize | undefined
@@ -33,7 +34,7 @@ class Database {
       },
       dialectOptions: config.dialectOptions,
 
-      models: [User]
+      models: [User, Office]
     })
 
     await this.sequelize
