@@ -2,6 +2,7 @@ import { Sequelize } from 'sequelize-typescript'
 import { config, dialect } from '../config/db.config'
 import { User } from '../models/user.model'
 import Office from '../models/office.model'
+import Service from '../models/service.model'
 
 class Database {
   public sequelize: Sequelize | undefined
@@ -35,7 +36,7 @@ class Database {
       timezone: 'Europe/Warsaw',
       dialectOptions: config.dialectOptions,
 
-      models: [User, Office]
+      models: [User, Office, Service]
     })
 
     await this.sequelize
