@@ -22,7 +22,7 @@ export class Service extends Model<Service> {
   })
   description!: string
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.NUMBER,
     allowNull: false
   })
   price!: number

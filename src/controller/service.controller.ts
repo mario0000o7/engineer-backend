@@ -4,8 +4,10 @@ import { Request, Response } from 'express'
 export default class ServiceController {
   async create(req: Request, res: Response) {
     const payload = req.body
+    console.log(payload)
     try {
-      return await ServiceRepository.save(payload)
+      const result = await ServiceRepository.save(payload)
+      return res.status(200).send(result)
     } catch (err) {
       console.log(err)
       return res.status(500).send('something went wrong')
