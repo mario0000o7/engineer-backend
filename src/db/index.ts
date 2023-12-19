@@ -3,6 +3,7 @@ import { config, dialect } from '../config/db.config'
 import { User } from '../models/user.model'
 import Office from '../models/office.model'
 import Service from '../models/service.model'
+import Appointment from '../models/appointment.model'
 
 class Database {
   public sequelize: Sequelize | undefined
@@ -36,7 +37,7 @@ class Database {
       timezone: 'Europe/Warsaw',
       dialectOptions: config.dialectOptions,
 
-      models: [User, Office, Service]
+      models: [User, Office, Service, Appointment]
     })
 
     await this.sequelize
