@@ -40,7 +40,7 @@ export class Service extends Model<Service> {
     type: DataType.DATE,
     allowNull: false
   })
-  duration!: number
+  duration!: Date
 }
 
 export default Service

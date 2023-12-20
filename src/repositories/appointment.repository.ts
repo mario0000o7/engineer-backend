@@ -1,5 +1,7 @@
 import { Op } from 'sequelize'
 import Appointment from '../models/appointment.model'
+import Service from '../models/service.model'
+import Office from '../models/office.model'
 
 interface IAppointmentRepository {
   save(appointment: Appointment): Promise<Appointment>
@@ -61,6 +63,63 @@ class AppointmentRepository implements IAppointmentRepository {
       where: {},
       truncate: false
     })
+  }
+
+  async readAvailableDatesForService(searchParams: { serviceId: number }): Promise<Date[]> {
+    const { serviceId } = searchParams
+
+    const service = await Service.findByPk(serviceId)
+    const office = await Office.findByPk(service?.officeId)
+    const dates: Date[] = []
+    if (!service || !office) {
+      return dates
+    }
+    const timeStep = service.duration.getHours() * 60 + service.duration.getMinutes()
+    for (let j = 0; j < 14; j++) {
+      const today = new Date()
+      today.setDate(today.getDate() + j)
+      const dayWeek = today.getDay()
+      if (dayWeek === 0 || dayWeek === 6) {
+        continue
+      }
+
+      for (
+        let i = office?.timeFrom.getHours() * 60 + office?.timeFrom.getMinutes();
+        i < office?.timeTo.getHours() * 60 + office?.timeTo.getMinutes();
+        i += 15
+      ) {
+        console.log('i', i)
+        const date = new Date(today.getFullYear(), today.getMonth(), today.getDate(), Math.floor(i / 60) + 1, i % 60)
+        const hoursPlusMinutes = date.getUTCHours() * 60 + date.getUTCMinutes()
+        const serviceHoursPlusMinutes = service.duration.getHours() * 60 + service.duration.getMinutes()
+        console.log('hoursPlusMinutes', hoursPlusMinutes)
+        console.log('Hours', date.getHours())
+        console.log('Minutes', date.getMinutes())
+        console.log('serviceHoursPlusMinutes', serviceHoursPlusMinutes)
+        console.log(
+          'office?.timeTo.getHours() * 60 + office?.timeTo.getMinutes()',
+          office?.timeTo.getHours() * 60 + office?.timeTo.getMinutes()
+        )
+        console.log('Date', date)
+        if (hoursPlusMinutes + serviceHoursPlusMinutes > office?.timeTo.getHours() * 60 + office?.timeTo.getMinutes()) {
+          break
+        }
+        dates.push(date)
+      }
+    }
+    const appointments = await Appointment.findAll({
+      where: {
+        serviceId: serviceId
+      }
+    })
+    appointments.forEach((appointment) => {
+      const index = dates.findIndex((date) => date.getTime() === appointment.date.getTime())
+      if (index !== -1) {
+        const deleteCount = service.duration.getUTCHours() * 60 + service.duration.getUTCMinutes() / timeStep
+        dates.splice(index, deleteCount)
+      }
+    })
+    return dates
   }
 }
 

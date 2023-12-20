@@ -19,6 +19,7 @@ interface IServiceRepository {
 
 class ServiceRepository implements IServiceRepository {
   async save(service: Service): Promise<Service> {
+    console.log('Service create', service)
     return await Service.create(service)
   }
 
@@ -40,6 +41,7 @@ class ServiceRepository implements IServiceRepository {
 
   async retrieveAllByOfficeId(officeId: number): Promise<Service[]> {
     return await Service.findAll({
+      attributes: ['id', 'name', 'description', 'price', 'duration', 'officeId'],
       where: {
         officeId: officeId
       }

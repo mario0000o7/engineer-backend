@@ -57,4 +57,15 @@ export default class AppointmentController {
       return res.status(500).send('something went wrong')
     }
   }
+
+  async readAvailableDatesForService(req: Request, res: Response) {
+    const payload = req.body
+    try {
+      const result = await AppointmentRepository.readAvailableDatesForService(payload)
+      return res.status(200).send(result)
+    } catch (err) {
+      console.log(err)
+      return res.status(500).send('something went wrong')
+    }
+  }
 }

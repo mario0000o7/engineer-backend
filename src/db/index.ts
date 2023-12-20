@@ -34,7 +34,7 @@ class Database {
         acquire: config.pool.acquire,
         idle: config.pool.idle
       },
-      timezone: 'Europe/Warsaw',
+      timezone: '+01:00',
       dialectOptions: config.dialectOptions,
 
       models: [User, Office, Service, Appointment]
