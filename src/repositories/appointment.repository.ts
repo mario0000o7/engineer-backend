@@ -113,9 +113,14 @@ class AppointmentRepository implements IAppointmentRepository {
       }
     })
     appointments.forEach((appointment) => {
-      const index = dates.findIndex((date) => date.getTime() === appointment.date.getTime())
+      const index = dates.findIndex((date) => date.getTime() === appointment.date.getTime() + 3600000)
+      console.log('ADate', appointment.date)
+      console.log('index', index)
       if (index !== -1) {
-        const deleteCount = service.duration.getUTCHours() * 60 + service.duration.getUTCMinutes() / timeStep
+        const deleteCount = (service.duration.getHours() * 60 + service.duration.getMinutes()) / 15
+        console.log('Service duration', service.duration.getHours() * 60 + service.duration.getMinutes())
+        console.log('deleteCount', deleteCount)
+        console.log('Date', dates[index])
         dates.splice(index, deleteCount)
       }
     })
