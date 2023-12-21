@@ -40,6 +40,11 @@ export class Appointment extends Model<Appointment> {
     allowNull: false
   })
   price!: number
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true
+  })
+  archive!: boolean
 }
 
 export default Appointment

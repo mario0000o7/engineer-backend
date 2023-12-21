@@ -54,15 +54,20 @@ export class Office extends Model<Office> {
   })
   ownerId!: number
   @Column({
-    type: DataType.DATE,
+    type: DataType.ARRAY(DataType.DATE),
     allowNull: false
   })
   timeFrom!: Date
   @Column({
-    type: DataType.DATE,
+    type: DataType.ARRAY(DataType.DATE),
     allowNull: false
   })
   timeTo!: Date
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true
+  })
+  archive!: boolean
 }
 
 export default Office

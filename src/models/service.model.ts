@@ -41,6 +41,11 @@ export class Service extends Model<Service> {
     allowNull: false
   })
   duration!: Date
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true
+  })
+  archive!: boolean
 }
 
 export default Service
