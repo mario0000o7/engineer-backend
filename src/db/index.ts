@@ -39,6 +39,8 @@ class Database {
 
       models: [User, Office, Service, Appointment]
     })
+    Service.associate()
+    Appointment.associate()
 
     await this.sequelize
       .authenticate()

@@ -29,7 +29,7 @@ export default class ServiceController {
   async delete(req: Request, res: Response) {
     const payload = req.body.serviceId
     try {
-      const result = await ServiceRepository.delete(payload)
+      const result = await ServiceRepository.archive(payload)
       return res.status(200).send(result.toString())
     } catch (err) {
       console.log(err)

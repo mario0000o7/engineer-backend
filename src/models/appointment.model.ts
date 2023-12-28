@@ -1,4 +1,5 @@
 import { Column, DataType, Model, Table } from 'sequelize-typescript'
+import Service from './service.model'
 
 @Table({
   tableName: 'appointments'
@@ -45,6 +46,10 @@ export class Appointment extends Model<Appointment> {
     allowNull: true
   })
   archive!: boolean
+
+  static associate() {
+    this.belongsTo(Service, { as: 'services', foreignKey: 'serviceId' })
+  }
 }
 
 export default Appointment

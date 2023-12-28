@@ -15,6 +15,8 @@ interface IServiceRepository {
   delete(serviceId: number): Promise<number>
 
   deleteAll(): Promise<number>
+
+  archive(serviceId: number): Promise<number>
 }
 
 class ServiceRepository implements IServiceRepository {
@@ -34,7 +36,8 @@ class ServiceRepository implements IServiceRepository {
       where: {
         name: {
           [Op.like]: `%${nameService}%`
-        }
+        },
+        archive: false
       }
     })
   }
@@ -43,7 +46,8 @@ class ServiceRepository implements IServiceRepository {
     return await Service.findAll({
       attributes: ['id', 'name', 'description', 'price', 'duration', 'officeId'],
       where: {
-        officeId: officeId
+        officeId: officeId,
+        archive: false
       }
     })
   }
@@ -58,6 +62,23 @@ class ServiceRepository implements IServiceRepository {
       return result[0]
     } catch (error) {
       throw new Error('Error while updating service')
+    }
+  }
+
+  async archive(serviceId: number): Promise<number> {
+    try {
+      const result = await Service.update(
+        { archive: true },
+        {
+          where: {
+            id: serviceId
+          }
+        }
+      )
+      return result[0]
+    } catch (error) {
+      console.log(error)
+      throw new Error('Error while archiving service')
     }
   }
 

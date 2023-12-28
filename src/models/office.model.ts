@@ -57,12 +57,12 @@ export class Office extends Model<Office> {
     type: DataType.ARRAY(DataType.DATE),
     allowNull: false
   })
-  timeFrom!: Date
+  timeFrom!: Date[]
   @Column({
     type: DataType.ARRAY(DataType.DATE),
     allowNull: false
   })
-  timeTo!: Date
+  timeTo!: Date[]
   @Column({
     type: DataType.BOOLEAN,
     allowNull: true

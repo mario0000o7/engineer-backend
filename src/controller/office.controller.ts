@@ -29,7 +29,7 @@ export default class OfficeController {
     const payload = req.body.officeId
     console.log(payload)
     try {
-      const result = await OfficeRepository.delete(payload)
+      const result = await OfficeRepository.archive(payload)
       return res.status(200).send(result.toString())
     } catch (err) {
       console.log(err)

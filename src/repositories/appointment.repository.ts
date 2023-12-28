@@ -14,12 +14,31 @@ interface IAppointmentRepository {
 
   delete(appointmentId: number): Promise<number>
 
+  archive(appointmentId: number): Promise<number>
+
   deleteAll(): Promise<number>
 }
 
 class AppointmentRepository implements IAppointmentRepository {
   async save(appointment: Appointment): Promise<Appointment> {
     return await Appointment.create(appointment)
+  }
+
+  async archive(appointmentId: number): Promise<number> {
+    try {
+      const result = await Appointment.update(
+        { archive: true },
+        {
+          where: {
+            id: appointmentId
+          }
+        }
+      )
+      return result[0]
+    } catch (error) {
+      console.log(error)
+      throw new Error('Error while archiving appointment')
+    }
   }
 
   async retrieveById(appointmentId: number): Promise<Appointment | null> {
@@ -74,57 +93,101 @@ class AppointmentRepository implements IAppointmentRepository {
     if (!service || !office) {
       return dates
     }
-    const timeStep = service.duration.getHours() * 60 + service.duration.getMinutes()
-    for (let j = 0; j < 14; j++) {
-      const today = new Date()
-      today.setDate(today.getDate() + j)
-      const dayWeek = today.getDay()
-      if (dayWeek === 0 || dayWeek === 6) {
-        continue
+    for (let i = 0; i < 14; i++) {
+      const date = new Date()
+      date.setDate(date.getDate() + i)
+      let dayOfWeek = date.getDay() - 1
+      if (dayOfWeek === -1) {
+        dayOfWeek = 6
       }
 
-      for (
-        let i = office?.timeFrom.getHours() * 60 + office?.timeFrom.getMinutes();
-        i < office?.timeTo.getHours() * 60 + office?.timeTo.getMinutes();
-        i += 15
-      ) {
-        console.log('i', i)
-        const date = new Date(today.getFullYear(), today.getMonth(), today.getDate(), Math.floor(i / 60) + 1, i % 60)
-        const hoursPlusMinutes = date.getUTCHours() * 60 + date.getUTCMinutes()
-        const serviceHoursPlusMinutes = service.duration.getHours() * 60 + service.duration.getMinutes()
-        console.log('hoursPlusMinutes', hoursPlusMinutes)
-        console.log('Hours', date.getHours())
-        console.log('Minutes', date.getMinutes())
-        console.log('serviceHoursPlusMinutes', serviceHoursPlusMinutes)
+      const startHour = office.timeFrom[dayOfWeek].getHours() * 60 + office.timeFrom[dayOfWeek].getMinutes()
+      const endHour = office.timeTo[dayOfWeek].getHours() * 60 + office.timeTo[dayOfWeek].getMinutes()
+      console.log(startHour, endHour)
+
+      for (let j = startHour; j <= endHour; j += 15) {
+        const newDate = new Date(date)
+        console.log('j', Math.floor(j / 60))
+        newDate.setHours(Math.floor(j / 60))
+        newDate.setMinutes(j % 60)
+        newDate.setSeconds(0)
+        newDate.setMilliseconds(0)
         console.log(
-          'office?.timeTo.getHours() * 60 + office?.timeTo.getMinutes()',
-          office?.timeTo.getHours() * 60 + office?.timeTo.getMinutes()
+          'Plus',
+          service?.duration.getHours() * 60 +
+            service?.duration.getMinutes() +
+            newDate.getHours() * 60 +
+            newDate.getMinutes()
         )
-        console.log('Date', date)
-        if (hoursPlusMinutes + serviceHoursPlusMinutes > office?.timeTo.getHours() * 60 + office?.timeTo.getMinutes()) {
-          break
-        }
-        dates.push(date)
+        // if (
+        //   newDate.getHours() * 60 +
+        //     newDate.getMinutes() +
+        //     service?.duration.getHours() * 60 +
+        //     service?.duration.getMinutes() >
+        //   endHour
+        // ) {
+        //   continue
+        // }
+
+        dates.push(newDate)
       }
     }
+    console.log('Dates', dates)
+    const deleteCount = (service.duration.getHours() * 60 + service.duration.getMinutes()) / 15
+
     const appointments = await Appointment.findAll({
-      where: {
-        serviceId: serviceId
-      }
+      attributes: ['id', 'userId', 'serviceId', 'date', 'price', 'archive'],
+      include: [
+        {
+          model: Service,
+          as: 'services',
+          attributes: [],
+          include: [
+            {
+              model: Office,
+              as: 'offices',
+              attributes: [],
+              where: {
+                id: office.id
+              }
+            }
+          ]
+        }
+      ]
     })
-    appointments.forEach((appointment) => {
-      const index = dates.findIndex((date) => date.getTime() === appointment.date.getTime() + 3600000)
-      console.log('ADate', appointment.date)
-      console.log('index', index)
-      if (index !== -1) {
-        const deleteCount = (service.duration.getHours() * 60 + service.duration.getMinutes()) / 15
-        console.log('Service duration', service.duration.getHours() * 60 + service.duration.getMinutes())
-        console.log('deleteCount', deleteCount)
-        console.log('Date', dates[index])
-        dates.splice(index, deleteCount)
+    console.log('Appointments', appointments)
+    for (const appointment of appointments) {
+      for (const date of dates) {
+        if (appointment.date.getTime() === date.getTime()) {
+          console.log('Date', date, 'Appointment', appointment.date, 'Delete count', deleteCount)
+          dates.splice(dates.indexOf(date) + 1, deleteCount - 1)
+          break
+        }
       }
-    })
-    return dates
+    }
+    const tmpDates = [...dates]
+    console.log('Dates', dates)
+    for (const date of dates) {
+      // if (date.getTime() < new Date().getTime()) {
+      //   dates.splice(dates.indexOf(date), 1)
+      //   continue
+      // }
+      console.log('Date', date)
+      for (let i = 1; i <= deleteCount; i++) {
+        const find = dates.find((d) => d.getTime() == date.getTime() + 15 * i * 60 * 1000)
+        // const tmp = date.getHours() * 60 + date.getMinutes() + 15 * i
+        // console.log('Date current', (tmp / 60).toFixed(0) + ':' + (tmp % 60).toFixed(0))
+        console.log('Date find', find)
+        if (!find) {
+          console.log('Date delete', date)
+          const l = tmpDates.splice(tmpDates.indexOf(date), 1)
+          console.log('Date delete', l)
+          break
+        }
+      }
+    }
+    console.log('Dates', tmpDates)
+    return tmpDates
   }
 }
 

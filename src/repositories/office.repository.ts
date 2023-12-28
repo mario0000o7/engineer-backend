@@ -15,6 +15,8 @@ interface IOfficeRepository {
   delete(officeId: number): Promise<number>
 
   deleteAll(): Promise<number>
+
+  archive(officeId: number): Promise<number>
 }
 
 class OfficeRepository implements IOfficeRepository {
@@ -29,7 +31,8 @@ class OfficeRepository implements IOfficeRepository {
   retrieveAllByOwnerId(ownerId: number): Promise<Office[]> {
     return Office.findAll({
       where: {
-        ownerId: ownerId
+        ownerId: ownerId,
+        archive: false
       }
     })
   }
@@ -39,6 +42,23 @@ class OfficeRepository implements IOfficeRepository {
       where: {},
       truncate: false
     })
+  }
+
+  async archive(officeId: number): Promise<number> {
+    try {
+      const result = await Office.update(
+        { archive: true },
+        {
+          where: {
+            id: officeId
+          }
+        }
+      )
+      return result[0]
+    } catch (error) {
+      console.log(error)
+      throw new Error('Error while archiving office')
+    }
   }
 
   async retrieveAll(searchParams: { nameOffice: string }): Promise<Office[]> {
@@ -59,7 +79,8 @@ class OfficeRepository implements IOfficeRepository {
       where: {
         name: {
           [Op.like]: `%${nameOffice}%`
-        }
+        },
+        archive: false
       }
     })
   }
@@ -83,6 +104,7 @@ class OfficeRepository implements IOfficeRepository {
       console.log('result', result)
       return result[0]
     } catch (error) {
+      console.log(error)
       throw new Error('Error while updating office')
     }
   }
