@@ -84,109 +84,238 @@ class AppointmentRepository implements IAppointmentRepository {
     })
   }
 
+  // async readAvailableDatesForService1(searchParams: { serviceId: number }): Promise<Date[]> {
+  //   const { serviceId } = searchParams
+  //
+  //   const service = await Service.findOne({
+  //     attributes: ['id', 'name', 'description', 'price', 'duration', 'officeId'],
+  //     where: {
+  //       id: serviceId,
+  //       archive: false
+  //     },
+  //     include: [
+  //       {
+  //         model: Office,
+  //         as: 'offices',
+  //         attributes: [
+  //           'id',
+  //           'name',
+  //           'address1',
+  //           'address2',
+  //           'city',
+  //           'country',
+  //           'postalCode',
+  //           'ownerId',
+  //           'timeFrom',
+  //           'timeTo'
+  //         ],
+  //         where: {
+  //           archive: false
+  //         }
+  //       }
+  //     ]
+  //   })
+  //   const office = service?.offices
+  //   console.log('Office', office)
+  //   const dates: Date[] = []
+  //   if (!service || !office) {
+  //     return dates
+  //   }
+  //   for (let i = 0; i < 14; i++) {
+  //     const date = new Date()
+  //     date.setDate(date.getDate() + i)
+  //     let dayOfWeek = date.getDay() - 1
+  //     if (dayOfWeek === -1) {
+  //       dayOfWeek = 6
+  //     }
+  //
+  //     const startHour = office.timeFrom[dayOfWeek].getHours() * 60 + office.timeFrom[dayOfWeek].getMinutes()
+  //     const endHour = office.timeTo[dayOfWeek].getHours() * 60 + office.timeTo[dayOfWeek].getMinutes()
+  //     console.log(startHour, endHour)
+  //
+  //     for (let j = startHour; j <= endHour; j += 15) {
+  //       const newDate = new Date(date)
+  //       console.log('j', Math.floor(j / 60))
+  //       newDate.setHours(Math.floor(j / 60))
+  //       newDate.setMinutes(j % 60)
+  //       newDate.setSeconds(0)
+  //       newDate.setMilliseconds(0)
+  //
+  //       dates.push(newDate)
+  //     }
+  //   }
+  //   console.log('Dates', dates)
+  //   const deleteCount = (service.duration.getHours() * 60 + service.duration.getMinutes()) / 15
+  //
+  //   const appointments = await Appointment.findAll({
+  //     attributes: ['id', 'userId', 'serviceId', 'date', 'price', 'archive'],
+  //     include: [
+  //       {
+  //         model: Service,
+  //         as: 'services',
+  //         attributes: ['duration'],
+  //         include: [
+  //           {
+  //             model: Office,
+  //             as: 'offices',
+  //             attributes: [],
+  //             where: {
+  //               id: office.id
+  //             }
+  //           }
+  //         ]
+  //       }
+  //     ]
+  //   })
+  //   console.log('Appointments', appointments)
+  //   for (const appointment of appointments) {
+  //     for (const date of dates) {
+  //       if (appointment.date.getTime() === date.getTime()) {
+  //         const serviceDuration =
+  //           (appointment.services?.duration.getHours() * 60 + appointment.services?.duration.getMinutes()) / 15
+  //         console.log('Date', date, 'Appointment', appointment.date, 'Delete count', serviceDuration)
+  //         const res = dates.splice(dates.indexOf(date), serviceDuration)
+  //         console.log('Res', res)
+  //         break
+  //       }
+  //     }
+  //   }
+  //   const tmpDates = [...dates]
+  //   console.log('Dates', dates)
+  //   for (const date of dates) {
+  //     // if (date.getTime() < new Date().getTime()) {
+  //     //   dates.splice(dates.indexOf(date), 1)
+  //     //   continue
+  //     // }
+  //     console.log('Date', date)
+  //     for (let i = 1; i <= deleteCount; i++) {
+  //       const find = dates.find((d) => d.getTime() == date.getTime() + 15 * i * 60 * 1000)
+  //       // const tmp = date.getHours() * 60 + date.getMinutes() + 15 * i
+  //       // console.log('Date current', (tmp / 60).toFixed(0) + ':' + (tmp % 60).toFixed(0))
+  //       console.log('Date find', find)
+  //       if (!find) {
+  //         console.log('Date delete', date)
+  //         const l = tmpDates.splice(tmpDates.indexOf(date), 1)
+  //         console.log('Date delete', l)
+  //         break
+  //       }
+  //     }
+  //   }
+  //   console.log('Dates', tmpDates)
+  //   return tmpDates
+  // }
+
   async readAvailableDatesForService(searchParams: { serviceId: number }): Promise<Date[]> {
     const { serviceId } = searchParams
+    const service = await this.getServiceWithOffice(serviceId)
+    const office = service?.offices
+    let dates: Date[] = []
 
-    const service = await Service.findByPk(serviceId)
-    const office = await Office.findByPk(service?.officeId)
-    const dates: Date[] = []
-    if (!service || !office) {
-      return dates
+    if (service && office) {
+      dates = this.generateDatesForOffice(office)
+      const deleteCount = this.getServiceDurationInQuarters(service)
+      const appointments = await this.getAppointmentsForOffice(office.id)
+
+      dates = this.removeBookedDates(dates, appointments)
+      dates = this.removeInsufficientDurationDates(dates, deleteCount)
+      dates = this.removeEdgeDates(dates, office.timeTo)
     }
+
+    return dates
+  }
+
+  private async getServiceWithOffice(serviceId: number) {
+    return await Service.findOne({
+      attributes: ['id', 'name', 'description', 'price', 'duration', 'officeId'],
+      where: { id: serviceId, archive: false },
+      include: [{ model: Office, as: 'offices', attributes: ['id', 'timeFrom', 'timeTo'], where: { archive: false } }]
+    })
+  }
+
+  private generateDatesForOffice(office: Office): Date[] {
+    const dates: Date[] = []
     for (let i = 0; i < 14; i++) {
       const date = new Date()
       date.setDate(date.getDate() + i)
       let dayOfWeek = date.getDay() - 1
-      if (dayOfWeek === -1) {
-        dayOfWeek = 6
-      }
+      if (dayOfWeek === -1) dayOfWeek = 6
 
       const startHour = office.timeFrom[dayOfWeek].getHours() * 60 + office.timeFrom[dayOfWeek].getMinutes()
       const endHour = office.timeTo[dayOfWeek].getHours() * 60 + office.timeTo[dayOfWeek].getMinutes()
-      console.log(startHour, endHour)
 
       for (let j = startHour; j <= endHour; j += 15) {
         const newDate = new Date(date)
-        console.log('j', Math.floor(j / 60))
         newDate.setHours(Math.floor(j / 60))
         newDate.setMinutes(j % 60)
         newDate.setSeconds(0)
         newDate.setMilliseconds(0)
-        console.log(
-          'Plus',
-          service?.duration.getHours() * 60 +
-            service?.duration.getMinutes() +
-            newDate.getHours() * 60 +
-            newDate.getMinutes()
-        )
-        // if (
-        //   newDate.getHours() * 60 +
-        //     newDate.getMinutes() +
-        //     service?.duration.getHours() * 60 +
-        //     service?.duration.getMinutes() >
-        //   endHour
-        // ) {
-        //   continue
-        // }
-
         dates.push(newDate)
       }
     }
-    console.log('Dates', dates)
-    const deleteCount = (service.duration.getHours() * 60 + service.duration.getMinutes()) / 15
+    return dates
+  }
 
-    const appointments = await Appointment.findAll({
+  private getServiceDurationInQuarters(service: Service): number {
+    return (service.duration.getHours() * 60 + service.duration.getMinutes()) / 15
+  }
+
+  private async getAppointmentsForOffice(officeId: number) {
+    return await Appointment.findAll({
       attributes: ['id', 'userId', 'serviceId', 'date', 'price', 'archive'],
       include: [
         {
           model: Service,
           as: 'services',
-          attributes: [],
-          include: [
-            {
-              model: Office,
-              as: 'offices',
-              attributes: [],
-              where: {
-                id: office.id
-              }
-            }
-          ]
+          attributes: ['duration'],
+          include: [{ model: Office, as: 'offices', attributes: [], where: { id: officeId } }]
         }
       ]
     })
-    console.log('Appointments', appointments)
+  }
+
+  private removeBookedDates(dates: Date[], appointments: Appointment[]): Date[] {
     for (const appointment of appointments) {
       for (const date of dates) {
         if (appointment.date.getTime() === date.getTime()) {
-          console.log('Date', date, 'Appointment', appointment.date, 'Delete count', deleteCount)
-          dates.splice(dates.indexOf(date) + 1, deleteCount - 1)
+          const serviceDuration = this.getServiceDurationInQuarters(appointment.services!)
+          dates.splice(dates.indexOf(date), serviceDuration)
           break
         }
       }
     }
+    return dates
+  }
+
+  private removeInsufficientDurationDates(dates: Date[], deleteCount: number): Date[] {
     const tmpDates = [...dates]
-    console.log('Dates', dates)
     for (const date of dates) {
-      // if (date.getTime() < new Date().getTime()) {
-      //   dates.splice(dates.indexOf(date), 1)
-      //   continue
-      // }
-      console.log('Date', date)
-      for (let i = 1; i <= deleteCount; i++) {
+      for (let i = 1; i < deleteCount; i++) {
         const find = dates.find((d) => d.getTime() == date.getTime() + 15 * i * 60 * 1000)
-        // const tmp = date.getHours() * 60 + date.getMinutes() + 15 * i
-        // console.log('Date current', (tmp / 60).toFixed(0) + ':' + (tmp % 60).toFixed(0))
-        console.log('Date find', find)
         if (!find) {
-          console.log('Date delete', date)
-          const l = tmpDates.splice(tmpDates.indexOf(date), 1)
-          console.log('Date delete', l)
+          tmpDates.splice(tmpDates.indexOf(date), 1)
           break
         }
       }
     }
-    console.log('Dates', tmpDates)
+    return tmpDates
+  }
+
+  private removeEdgeDates(dates: Date[], timeTo: Date[]): Date[] {
+    const tmpDates = [...dates]
+    for (const date of dates) {
+      if (date.getTime() < new Date().getTime()) {
+        tmpDates.splice(tmpDates.indexOf(date), 1)
+        continue
+      }
+      let numberOfWeek = date.getDay() - 1
+      if (numberOfWeek === -1) numberOfWeek = 6
+      if (
+        date.getHours() * 60 + date.getMinutes() >=
+        timeTo[numberOfWeek].getHours() * 60 + timeTo[numberOfWeek].getMinutes()
+      ) {
+        tmpDates.splice(tmpDates.indexOf(date), 1)
+      }
+    }
     return tmpDates
   }
 }

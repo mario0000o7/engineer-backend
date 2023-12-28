@@ -1,4 +1,4 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript'
+import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
 import Service from './service.model'
 
 @Table({
@@ -21,6 +21,7 @@ export class Appointment extends Model<Appointment> {
     }
   })
   userId!: number
+  @ForeignKey(() => Service)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -46,9 +47,11 @@ export class Appointment extends Model<Appointment> {
     allowNull: true
   })
   archive!: boolean
+  @BelongsTo(() => Service, 'serviceId')
+  services!: Service
 
   static associate() {
-    this.belongsTo(Service, { as: 'services', foreignKey: 'serviceId' })
+    // this.belongsTo(Service, { as: 'services', foreignKey: 'serviceId' })
   }
 }
 

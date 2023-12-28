@@ -1,4 +1,4 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript'
+import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript'
 import Office from './office.model'
 
 @Table({
@@ -27,6 +27,7 @@ export class Service extends Model<Service> {
     allowNull: false
   })
   price!: number
+  @ForeignKey(() => Office)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -47,9 +48,11 @@ export class Service extends Model<Service> {
     allowNull: true
   })
   archive!: boolean
+  @BelongsTo(() => Office, 'officeId')
+  offices!: Office
 
   static associate() {
-    this.belongsTo(Office, { as: 'offices', foreignKey: 'officeId' })
+    // this.belongsTo(Office, { as: 'office', foreignKey: 'officeId' })
   }
 }
 
