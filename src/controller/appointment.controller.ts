@@ -68,4 +68,26 @@ export default class AppointmentController {
       return res.status(500).send('something went wrong')
     }
   }
+
+  async getAppointmentsForUser(req: Request, res: Response) {
+    const payload = req.body.userId
+    try {
+      const result = await AppointmentRepository.getAllAppointmentsForUser(payload)
+      return res.status(200).send(result)
+    } catch (err) {
+      console.log(err)
+      return res.status(500).send('something went wrong')
+    }
+  }
+
+  async getAppointmentsForDoctor(req: Request, res: Response) {
+    const payload = req.body.userId
+    try {
+      const result = await AppointmentRepository.getAllAppointmentsForDoctor(payload)
+      return res.status(200).send(result)
+    } catch (err) {
+      console.log(err)
+      return res.status(500).send('something went wrong')
+    }
+  }
 }

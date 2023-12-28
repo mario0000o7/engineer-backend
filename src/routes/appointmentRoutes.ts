@@ -16,6 +16,8 @@ class AppointmentRoutes {
     this.router.post('/update', this.appointmentController.update)
     this.router.post('/delete', this.appointmentController.delete)
     this.router.post('/readAvailableDatesForService', this.appointmentController.readAvailableDatesForService)
+    this.router.post('/getAppointmentsByUserId', this.appointmentController.getAppointmentsForUser)
+    this.router.post('/getAppointmentsByDoctorId', this.appointmentController.getAppointmentsForDoctor)
   }
 }
 
