@@ -104,7 +104,7 @@ class AppointmentRepository implements IAppointmentRepository {
         {
           model: Service,
           as: 'services',
-          attributes: ['duration', 'name'],
+          attributes: ['duration', 'name', 'description', 'price', 'archive', 'officeId', 'id'],
           include: [
             {
               model: Office,
