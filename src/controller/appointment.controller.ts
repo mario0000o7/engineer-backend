@@ -36,6 +36,18 @@ export default class AppointmentController {
     }
   }
 
+  async moveAppointment(req: Request, res: Response) {
+    const payload = req.body
+    const { appointmentId, date } = payload
+    try {
+      const result = await AppointmentRepository.moveAppointment(appointmentId, date)
+      return res.status(200).send(result.toString())
+    } catch (err) {
+      console.log(err)
+      return res.status(400).send('something went wrong')
+    }
+  }
+
   async retrieveAll(req: Request, res: Response) {
     const payload = req.body
     try {

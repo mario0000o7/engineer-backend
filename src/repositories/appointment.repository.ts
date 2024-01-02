@@ -90,15 +90,27 @@ class AppointmentRepository implements IAppointmentRepository {
   async getAllAppointmentsForUser(userId: number): Promise<Appointment[]> {
     return await Appointment.findAll({
       attributes: ['id', 'userId', 'serviceId', 'date', 'price', 'archive'],
-      where: {
-        userId: userId
-      }
+      where: { userId: userId },
+      include: [
+        {
+          model: Service,
+          as: 'services',
+          attributes: ['duration', 'name', 'description', 'price', 'archive', 'officeId', 'id'],
+          include: [
+            {
+              model: Office,
+              as: 'offices',
+              attributes: ['name']
+            }
+          ]
+        }
+      ]
     })
   }
 
   async getAllAppointmentsForDoctor(userId: number): Promise<Appointment[]> {
     console.log(userId)
-    const res = await Appointment.findAll({
+    return await Appointment.findAll({
       attributes: ['id', 'userId', 'serviceId', 'date', 'price', 'archive'],
       include: [
         {
@@ -116,7 +128,25 @@ class AppointmentRepository implements IAppointmentRepository {
         }
       ]
     })
-    return res
+  }
+
+  async moveAppointment(appointmentId: number, date: Date): Promise<number> {
+    console.log(appointmentId)
+    console.log(date)
+    try {
+      const result = await Appointment.update(
+        { date: date },
+        {
+          where: {
+            id: appointmentId
+          }
+        }
+      )
+      return result[0]
+    } catch (error) {
+      console.log(error)
+      throw new Error('Error while moving appointment')
+    }
   }
 
   async readAvailableDatesForService(searchParams: { serviceId: number }): Promise<Date[]> {
