@@ -96,6 +96,7 @@ export default class AppointmentController {
     const payload = req.body.userId
     try {
       const result = await AppointmentRepository.getAllAppointmentsForDoctor(payload)
+      console.log('result', result)
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)

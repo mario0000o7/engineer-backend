@@ -97,10 +97,12 @@ class AppointmentRepository implements IAppointmentRepository {
           model: Service,
           as: 'services',
           attributes: ['duration', 'name', 'description', 'price', 'archive', 'officeId', 'id'],
+          required: true,
           include: [
             {
               model: Office,
               as: 'offices',
+              required: true,
               attributes: ['name']
             }
           ]
@@ -118,11 +120,13 @@ class AppointmentRepository implements IAppointmentRepository {
           model: Service,
           as: 'services',
           attributes: ['duration', 'name', 'description', 'price', 'archive', 'officeId', 'id'],
+          required: true,
           include: [
             {
               model: Office,
               as: 'offices',
               attributes: ['name'],
+              required: true,
               where: { ownerId: userId }
             }
           ]
@@ -189,7 +193,7 @@ class AppointmentRepository implements IAppointmentRepository {
     return await DayOff.findAll({
       attributes: ['id', 'officeId', 'dateFrom', 'dateTo'],
       where: { officeId: officeId },
-      include: [{ model: Office, as: 'offices', attributes: ['id', 'name'], where: { id: officeId } }]
+      include: [{ model: Office, as: 'offices', required: true, attributes: ['id', 'name'], where: { id: officeId } }]
     })
   }
 
@@ -198,7 +202,15 @@ class AppointmentRepository implements IAppointmentRepository {
     return await Service.findOne({
       attributes: ['id', 'name', 'description', 'price', 'duration', 'officeId'],
       where: { id: serviceId, archive: false },
-      include: [{ model: Office, as: 'offices', attributes: ['id', 'timeFrom', 'timeTo'], where: { archive: false } }]
+      include: [
+        {
+          model: Office,
+          as: 'offices',
+          required: true,
+          attributes: ['id', 'timeFrom', 'timeTo'],
+          where: { archive: false }
+        }
+      ]
     })
   }
 
@@ -238,7 +250,7 @@ class AppointmentRepository implements IAppointmentRepository {
           as: 'services',
           attributes: ['duration'],
           where: { officeId: officeId },
-          include: [{ model: Office, as: 'offices', attributes: [], where: { id: officeId } }]
+          include: [{ model: Office, as: 'offices', required: true, attributes: [], where: { id: officeId } }]
         }
       ]
     })

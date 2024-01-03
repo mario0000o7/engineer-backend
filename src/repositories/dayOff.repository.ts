@@ -44,7 +44,7 @@ class DayOffRepository implements IDayOffRepository {
       where: {
         officeId: officeId
       },
-      include: { model: Office, as: 'offices', attributes: ['name'] }
+      include: { model: Office, required: true, as: 'offices', attributes: ['name'] }
     })
   }
 
@@ -59,7 +59,7 @@ class DayOffRepository implements IDayOffRepository {
 
   async retrieveByUserId(userId: number): Promise<DayOff[]> {
     return DayOff.findAll({
-      include: { model: Office, as: 'offices', attributes: ['name'], where: { ownerId: userId } }
+      include: { model: Office, as: 'offices', required: true, attributes: ['name'], where: { ownerId: userId } }
     })
   }
 }
