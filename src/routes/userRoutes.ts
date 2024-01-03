@@ -18,6 +18,7 @@ class UserRoutes {
     this.router.post('/findUser', this.userController.findAll)
     this.router.post('/getAllUser', this.userController.getAllUsers)
     this.router.post('/getUserByIds', this.userController.findByIds)
+    this.router.post('/update', this.userController.update)
   }
 }
 

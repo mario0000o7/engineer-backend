@@ -3,6 +3,7 @@ import userRoutes from './userRoutes'
 import officeRoutes from './officeRoutes'
 import serviceRoutes from './serviceRoutes'
 import appointmentRoutes from './appointmentRoutes'
+import dayOffRoutes from './dayOffRoutes'
 
 export default class Routes {
   constructor(app: Application) {
@@ -10,5 +11,6 @@ export default class Routes {
     app.use('/api/office', officeRoutes)
     app.use('/api/service', serviceRoutes)
     app.use('/api/appointment', appointmentRoutes)
+    app.use('/api/dayOff', dayOffRoutes)
   }
 }

@@ -2,6 +2,7 @@ import { Op } from 'sequelize'
 import Appointment from '../models/appointment.model'
 import Service from '../models/service.model'
 import Office from '../models/office.model'
+import { DayOff } from '../models/dayOff.model'
 
 interface IAppointmentRepository {
   save(appointment: Appointment): Promise<Appointment>
@@ -153,6 +154,7 @@ class AppointmentRepository implements IAppointmentRepository {
     const { serviceId } = searchParams
     const service = await this.getServiceWithOffice(serviceId)
     const office = service?.offices
+    const dayOffs = this.getDayOffsForOffice(office!.id)
     let dates: Date[] = []
 
     if (service && office) {
@@ -163,12 +165,36 @@ class AppointmentRepository implements IAppointmentRepository {
       dates = this.removeBookedDates(dates, appointments)
       dates = this.removeInsufficientDurationDates(dates, deleteCount)
       dates = this.removeEdgeDates(dates, office.timeTo)
+      await dayOffs.then((dayOffs) => {
+        for (const dayOff of dayOffs) {
+          const startDayOff = new Date(dayOff.dateFrom)
+          startDayOff.setHours(0)
+          startDayOff.setMinutes(0)
+          startDayOff.setSeconds(0)
+          startDayOff.setMilliseconds(0)
+          const endDayOff = new Date(dayOff.dateTo)
+          endDayOff.setHours(23)
+          endDayOff.setMinutes(59)
+          endDayOff.setSeconds(59)
+          endDayOff.setMilliseconds(999)
+          dates = dates.filter((date) => date.getTime() < startDayOff.getTime() || date.getTime() > endDayOff.getTime())
+        }
+      })
     }
 
     return dates
   }
 
+  private async getDayOffsForOffice(officeId: number) {
+    return await DayOff.findAll({
+      attributes: ['id', 'officeId', 'dateFrom', 'dateTo'],
+      where: { officeId: officeId },
+      include: [{ model: Office, as: 'offices', attributes: ['id', 'name'], where: { id: officeId } }]
+    })
+  }
+
   private async getServiceWithOffice(serviceId: number) {
+    console.log('serviceId', serviceId)
     return await Service.findOne({
       attributes: ['id', 'name', 'description', 'price', 'duration', 'officeId'],
       where: { id: serviceId, archive: false },
@@ -211,6 +237,7 @@ class AppointmentRepository implements IAppointmentRepository {
           model: Service,
           as: 'services',
           attributes: ['duration'],
+          where: { officeId: officeId },
           include: [{ model: Office, as: 'offices', attributes: [], where: { id: officeId } }]
         }
       ]
@@ -218,6 +245,7 @@ class AppointmentRepository implements IAppointmentRepository {
   }
 
   private removeBookedDates(dates: Date[], appointments: Appointment[]): Date[] {
+    console.log('appointments', appointments)
     for (const appointment of appointments) {
       for (const date of dates) {
         if (appointment.date.getTime() === date.getTime()) {

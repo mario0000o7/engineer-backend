@@ -4,6 +4,7 @@ import { User } from '../models/user.model'
 import Office from '../models/office.model'
 import Service from '../models/service.model'
 import Appointment from '../models/appointment.model'
+import { DayOff } from '../models/dayOff.model'
 
 class Database {
   public sequelize: Sequelize | undefined
@@ -37,7 +38,7 @@ class Database {
       timezone: '+01:00',
       dialectOptions: config.dialectOptions,
 
-      models: [User, Office, Service, Appointment]
+      models: [User, Office, Service, Appointment, DayOff]
     })
     Service.associate()
     Appointment.associate()

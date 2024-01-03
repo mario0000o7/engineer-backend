@@ -66,9 +66,19 @@ export default class UserController {
   }
 
   async update(req: Request, res: Response) {
-    // const payload = req.params
-    // const result = await UserRepository.update(payload)
-    return res.status(201).send('user updated')
+    const payload = req.body
+    try {
+      console.log('password', payload.password)
+      if (payload.password) {
+        payload.password = bcrypt.hashSync(payload.password, 10)
+      }
+      const result = await UserRepository.update(payload)
+      return res.status(200).send(result.toString())
+    } catch (err) {
+      console.log('Update error')
+      console.log(err)
+      return res.status(400).send('something went wrong')
+    }
   }
 
   async findAll(req: Request, res: Response) {
