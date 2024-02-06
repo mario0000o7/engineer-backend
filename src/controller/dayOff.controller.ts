@@ -37,9 +37,9 @@ export default class DayOffController {
   }
 
   async retrieveAllByOfficeId(req: Request, res: Response) {
-    const payload = req.body
+    const payload = req.query.officeId as string
     try {
-      const result = await DayOffRepository.retrieveAllByOfficeId(payload.officeId)
+      const result = await DayOffRepository.retrieveAllByOfficeId(parseInt(payload))
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)
@@ -48,9 +48,9 @@ export default class DayOffController {
   }
 
   async retrieveById(req: Request, res: Response) {
-    const payload = req.body
+    const payload = req.query.dayOffId as string
     try {
-      const result = await DayOffRepository.retrieveById(payload.dayOffId)
+      const result = await DayOffRepository.retrieveById(parseInt(payload))
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)
@@ -59,9 +59,9 @@ export default class DayOffController {
   }
 
   async retrieveByUserId(req: Request, res: Response) {
-    const payload = req.body
+    const payload = req.query.userId as string
     try {
-      const result = await DayOffRepository.retrieveByUserId(payload.userId)
+      const result = await DayOffRepository.retrieveByUserId(parseInt(payload))
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)

@@ -38,9 +38,9 @@ export default class OfficeController {
   }
 
   async retrieveAll(req: Request, res: Response) {
-    const payload = req.body
+    const payload = req.query.nameOffice as string
     try {
-      const result = await OfficeRepository.retrieveAll(payload)
+      const result = await OfficeRepository.retrieveAll({ nameOffice: payload })
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)
@@ -49,9 +49,9 @@ export default class OfficeController {
   }
 
   async retrieveById(req: Request, res: Response) {
-    const payload = req.body
+    const payload = req.query.officeId as string
     try {
-      const result = await OfficeRepository.retrieveById(payload)
+      const result = await OfficeRepository.retrieveById(parseInt(payload))
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)
@@ -60,10 +60,9 @@ export default class OfficeController {
   }
 
   async retrieveByOwnerId(req: Request, res: Response) {
-    const payload = req.body
-    const { ownerId } = payload
+    const ownerId = req.query.ownerId as string
     try {
-      const result = await OfficeRepository.retrieveAllByOwnerId(ownerId)
+      const result = await OfficeRepository.retrieveAllByOwnerId(parseInt(ownerId))
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)

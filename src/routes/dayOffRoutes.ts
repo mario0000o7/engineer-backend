@@ -12,11 +12,11 @@ class DayOffRoutes {
 
   initializeRoutes() {
     this.router.post('/create', this.dayOffController.create)
-    this.router.post('/update', this.dayOffController.update)
-    this.router.post('/delete', this.dayOffController.delete)
-    this.router.post('/retrieveAllByOfficeId', this.dayOffController.retrieveAllByOfficeId)
-    this.router.post('/retrieveById', this.dayOffController.retrieveById)
-    this.router.post('/retrieveByUserId', this.dayOffController.retrieveByUserId)
+    this.router.put('/update', this.dayOffController.update)
+    this.router.delete('/delete', this.dayOffController.delete)
+    this.router.get('/retrieveAllByOfficeId', this.dayOffController.retrieveAllByOfficeId)
+    this.router.get('/retrieveById', this.dayOffController.retrieveById)
+    this.router.get('/retrieveByUserId', this.dayOffController.retrieveByUserId)
   }
 }
 

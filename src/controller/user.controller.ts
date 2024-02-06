@@ -4,6 +4,10 @@ import { DataBaseError } from './user.controller.types'
 import bcrypt from 'bcrypt'
 import { generateTokenJwt } from '../services/authService'
 import User from '../models/user.model'
+import { CometChat } from '@cometchat/chat-sdk-javascript'
+import * as process from 'process'
+import axios from 'axios'
+import qs from 'qs'
 
 export default class UserController {
   async register(req: Request, res: Response) {
@@ -12,6 +16,23 @@ export default class UserController {
     try {
       const result = await UserRepository.save(payload)
       const jwtToken = generateTokenJwt(result)
+      const user = new CometChat.User(result.id)
+      if (parseInt(result.role) === 1) {
+        user.setRole('doktor')
+      }
+      if (parseInt(result.role) === 2) {
+        user.setRole('pacjent')
+      }
+      user.setName(result.email)
+      await CometChat.createUser(user, process.env.AUTH_KEY_COSMO_CHAT!).then(
+        (user: CometChat.User) => {
+          console.log('user created', user)
+        },
+        (error: CometChat.CometChatException) => {
+          console.log('error', error)
+          throw error
+        }
+      )
 
       return res.status(200).send({
         token: jwtToken
@@ -82,11 +103,11 @@ export default class UserController {
   }
 
   async findAll(req: Request, res: Response) {
-    const filters: string = req.body.fullName as string
-    const role: number = req.body.role as number
+    const filters: string = req.query.fullName as string
+    const role = req.query.role as string
     let results
     try {
-      results = await UserRepository.retrieveAll({ fullName: filters, role: role })
+      results = await UserRepository.retrieveAll({ fullName: filters, role: parseInt(role) })
     } catch (err) {
       return res.status(400).send('invalid filters')
     }
@@ -94,10 +115,10 @@ export default class UserController {
   }
 
   async getAllUsers(req: Request, res: Response) {
-    const role: number = req.body.role as number
+    const role = req.query.role as string
     let results
     try {
-      results = await UserRepository.retrieveAllByRole(role)
+      results = await UserRepository.retrieveAllByRole(parseInt(role))
     } catch (err) {
       return res.status(400).send('invalid filters')
     }
@@ -105,7 +126,15 @@ export default class UserController {
   }
 
   async findByIds(req: Request, res: Response) {
-    const ids: number[] = req.body.ids
+    console.log('findAll')
+
+    console.log(req)
+    if (!req.query.ids) {
+      return res.status(400).send('invalid filters')
+    }
+    console.log(req.query.ids)
+    const stringIds: string = req.query.ids as string
+    const ids: number[] = stringIds.split(',').map((value) => parseInt(value))
     let results
     try {
       results = await UserRepository.retrieveByIds(ids)
@@ -139,7 +168,7 @@ export default class UserController {
 
   async findByMail(req: Request, res: Response) {
     try {
-      const email = req.body.email
+      const email = req.query.email as string
 
       const result = await UserRepository.retrieveByMail(email)
       return res.status(200).send({ userExists: result !== null })
@@ -149,9 +178,67 @@ export default class UserController {
     }
   }
 
+  async sendSMS(req: Request, res: Response) {
+    const phoneNumber = req.body.phoneNumber as string
+    const phoneCode = req.body.phoneCode as string
+    try {
+      const body = {
+        To: phoneCode + phoneNumber,
+        Channel: 'sms'
+      }
+
+      const response = await axios.post(
+        `${process.env.TWILIO_URL}/${process.env.TWILIO_VERIFY_SID}/Verifications`,
+        qs.stringify(body),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${btoa(`${process.env.TWILIO_SID}:${process.env.TWILIO_AUTH_TOKEN}`)}`
+          }
+        }
+      )
+
+      const json = await response.data
+      console.log(json)
+      res.status(200).send({ status: json.status === 'pending' })
+      // return json.status === 'pending'
+    } catch (error) {
+      console.log(error)
+      res.status(400).send('error')
+    }
+  }
+
+  async checkVerification(req: Request, res: Response) {
+    try {
+      const phoneNumber = req.body.phoneNumber as string
+      const phoneCode = req.body.phoneCode as string
+      const code = req.body.code as string
+      const data = qs.stringify({
+        To: phoneCode + phoneNumber,
+        Code: code
+      })
+
+      const response = await axios.post(
+        `${process.env.TWILIO_URL}/${process.env.TWILIO_VERIFY_SID}/VerificationCheck`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${btoa(`${process.env.TWILIO_SID}:${process.env.TWILIO_AUTH_TOKEN}`)}`
+          }
+        }
+      )
+      const json = await response.data
+      res.status(200).send({ valid: json.valid })
+    } catch (error) {
+      console.log(error)
+      res.status(400).send('error')
+    }
+  }
+
   async findByPhone(req: Request, res: Response) {
     try {
-      const phone = req.body.phone
+      const phone = req.query.phone as string
 
       const result = await UserRepository.retrieveByPhone(phone)
       return res.status(200).send({ userExists: result !== null })

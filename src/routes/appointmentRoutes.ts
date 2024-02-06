@@ -11,14 +11,14 @@ class AppointmentRoutes {
 
   initializeRoutes(): void {
     this.router.post('/create', this.appointmentController.create)
-    this.router.post('/readAll', this.appointmentController.retrieveAll)
-    this.router.post('/readById', this.appointmentController.retrieveById)
-    this.router.post('/update', this.appointmentController.update)
-    this.router.post('/delete', this.appointmentController.delete)
-    this.router.post('/readAvailableDatesForService', this.appointmentController.readAvailableDatesForService)
-    this.router.post('/getAppointmentsByUserId', this.appointmentController.getAppointmentsForUser)
-    this.router.post('/getAppointmentsByDoctorId', this.appointmentController.getAppointmentsForDoctor)
-    this.router.post('/moveAppointment', this.appointmentController.moveAppointment)
+    this.router.get('/readAll', this.appointmentController.retrieveAll)
+    this.router.get('/readById', this.appointmentController.retrieveById)
+    this.router.put('/update', this.appointmentController.update)
+    this.router.delete('/delete', this.appointmentController.delete)
+    this.router.get('/readAvailableDatesForService', this.appointmentController.readAvailableDatesForService)
+    this.router.get('/getAppointmentsByUserId', this.appointmentController.getAppointmentsForUser)
+    this.router.get('/getAppointmentsByDoctorId', this.appointmentController.getAppointmentsForDoctor)
+    this.router.put('/moveAppointment', this.appointmentController.moveAppointment)
   }
 }
 

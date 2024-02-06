@@ -60,9 +60,9 @@ export default class AppointmentController {
   }
 
   async retrieveById(req: Request, res: Response) {
-    const payload = req.body
+    const payload = req.query.appointmentId as string
     try {
-      const result = await AppointmentRepository.retrieveById(payload)
+      const result = await AppointmentRepository.retrieveById(parseInt(payload))
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)
@@ -71,9 +71,9 @@ export default class AppointmentController {
   }
 
   async readAvailableDatesForService(req: Request, res: Response) {
-    const payload = req.body
+    const payload = req.query.serviceId as string
     try {
-      const result = await AppointmentRepository.readAvailableDatesForService(payload)
+      const result = await AppointmentRepository.readAvailableDatesForService({ serviceId: parseInt(payload) })
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)
@@ -82,9 +82,9 @@ export default class AppointmentController {
   }
 
   async getAppointmentsForUser(req: Request, res: Response) {
-    const payload = req.body.userId
+    const payload = req.query.userId as string
     try {
-      const result = await AppointmentRepository.getAllAppointmentsForUser(payload)
+      const result = await AppointmentRepository.getAllAppointmentsForUser(parseInt(payload))
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)
@@ -93,9 +93,9 @@ export default class AppointmentController {
   }
 
   async getAppointmentsForDoctor(req: Request, res: Response) {
-    const payload = req.body.userId
+    const payload = req.query.doctorId as string
     try {
-      const result = await AppointmentRepository.getAllAppointmentsForDoctor(payload)
+      const result = await AppointmentRepository.getAllAppointmentsForDoctor(parseInt(payload))
       console.log('result', result)
       return res.status(200).send(result)
     } catch (err) {

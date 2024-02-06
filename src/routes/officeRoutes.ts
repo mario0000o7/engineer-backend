@@ -12,11 +12,11 @@ class OfficeRoutes {
 
   initializeRoutes() {
     this.router.post('/create', this.officeController.create)
-    this.router.post('/update', this.officeController.update)
-    this.router.post('/delete', this.officeController.delete)
-    this.router.post('/retrieveAll', this.officeController.retrieveAll)
-    this.router.post('/retrieveById', this.officeController.retrieveById)
-    this.router.post('/retrieveByOwnerId', this.officeController.retrieveByOwnerId)
+    this.router.put('/update', this.officeController.update)
+    this.router.delete('/delete', this.officeController.delete)
+    this.router.get('/retrieveAll', this.officeController.retrieveAll)
+    this.router.get('/retrieveById', this.officeController.retrieveById)
+    this.router.get('/retrieveByOwnerId', this.officeController.retrieveByOwnerId)
   }
 }
 

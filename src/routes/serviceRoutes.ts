@@ -11,10 +11,10 @@ class ServiceRoutes {
 
   initializeRoutes() {
     this.router.post('/create', this.serviceController.create)
-    this.router.post('/readAllOffices', this.serviceController.retrieveAll)
-    this.router.post('/update', this.serviceController.update)
-    this.router.post('/delete', this.serviceController.delete)
-    this.router.post('/retrieveAllByOfficeId', this.serviceController.retrieveAllByOfficeId)
+    this.router.get('/readAllOffices', this.serviceController.retrieveAll)
+    this.router.put('/update', this.serviceController.update)
+    this.router.delete('/delete', this.serviceController.delete)
+    this.router.get('/retrieveAllByOfficeId', this.serviceController.retrieveAllByOfficeId)
   }
 }
 

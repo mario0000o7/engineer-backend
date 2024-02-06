@@ -14,12 +14,14 @@ class UserRoutes {
   initializeRoutes() {
     this.router.post('/register', passwordMiddleware, this.userController.register)
     this.router.post('/login', this.userController.login)
-    this.router.post('/checkEmail', this.userController.findByMail)
-    this.router.post('/checkPhone', this.userController.findByPhone)
-    this.router.post('/findUser', userMiddleware, this.userController.findAll)
-    this.router.post('/getAllUser', userMiddleware, this.userController.getAllUsers)
-    this.router.post('/getUserByIds', userMiddleware, this.userController.findByIds)
-    this.router.post('/update', userMiddleware, this.userController.update)
+    this.router.get('/checkEmail', this.userController.findByMail)
+    this.router.get('/checkPhone', this.userController.findByPhone)
+    this.router.get('/findUser', userMiddleware, this.userController.findAll)
+    this.router.get('/getAllUser', userMiddleware, this.userController.getAllUsers)
+    this.router.get('/getUserByIds', userMiddleware, this.userController.findByIds)
+    this.router.put('/update', userMiddleware, this.userController.update)
+    this.router.post('/sendSMS', this.userController.sendSMS)
+    this.router.post('/verifySMS', this.userController.checkVerification)
   }
 }
 

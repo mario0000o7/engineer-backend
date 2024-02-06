@@ -38,9 +38,9 @@ export default class ServiceController {
   }
 
   async retrieveAll(req: Request, res: Response) {
-    const payload = req.body
+    const payload = req.query.nameService as string
     try {
-      const result = await ServiceRepository.retrieveAll(payload)
+      const result = await ServiceRepository.retrieveAll({ nameService: payload })
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)
@@ -60,10 +60,10 @@ export default class ServiceController {
   }
 
   async retrieveAllByOfficeId(req: Request, res: Response) {
-    const payload = req.body.officeId
+    const payload = req.query.officeId as string
     console.log(payload)
     try {
-      const result = await ServiceRepository.retrieveAllByOfficeId(payload)
+      const result = await ServiceRepository.retrieveAllByOfficeId(parseInt(payload))
       return res.status(200).send(result)
     } catch (err) {
       console.log(err)

@@ -29,8 +29,10 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@cometchat/chat-sdk-javascript": "^4.0.3",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.5",
+    "axios": "^1.6.7",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
