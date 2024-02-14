@@ -16,6 +16,21 @@ export default class Server {
   constructor(app: Application) {
     this.config(app)
     this.syncDatabase()
+    // const appID: string = process.env.APP_ID_COSMO_CHAT!
+    // const region: string = process.env.REGION_COSMO_CHAT!
+    // const appSetting: CometChat.AppSettings = new CometChat.AppSettingsBuilder()
+    //   .subscribePresenceForAllUsers()
+    //   .setRegion(region)
+    //   .autoEstablishSocketConnection(true)
+    //   .build()
+    // CometChat.init(appID, appSetting).then(
+    //   (initialized: boolean) => {
+    //     console.log('Initialization completed successfully', initialized)
+    //   },
+    //   (error: CometChat.CometChatException) => {
+    //     console.log('Initialization failed with error:', error)
+    //   }
+    // )
     new Routes(app)
   }
 

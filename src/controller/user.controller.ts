@@ -4,7 +4,6 @@ import { DataBaseError } from './user.controller.types'
 import bcrypt from 'bcrypt'
 import { generateTokenJwt } from '../services/authService'
 import User from '../models/user.model'
-import { CometChat } from '@cometchat/chat-sdk-javascript'
 import * as process from 'process'
 import axios from 'axios'
 import qs from 'qs'
@@ -16,23 +15,23 @@ export default class UserController {
     try {
       const result = await UserRepository.save(payload)
       const jwtToken = generateTokenJwt(result)
-      const user = new CometChat.User(result.id)
-      if (parseInt(result.role) === 1) {
-        user.setRole('doktor')
-      }
-      if (parseInt(result.role) === 2) {
-        user.setRole('pacjent')
-      }
-      user.setName(result.email)
-      await CometChat.createUser(user, process.env.AUTH_KEY_COSMO_CHAT!).then(
-        (user: CometChat.User) => {
-          console.log('user created', user)
-        },
-        (error: CometChat.CometChatException) => {
-          console.log('error', error)
-          throw error
-        }
-      )
+      // const user = new CometChat.User(result.id)
+      // if (parseInt(result.role) === 1) {
+      //   user.setRole('doktor')
+      // }
+      // if (parseInt(result.role) === 2) {
+      //   user.setRole('pacjent')
+      // }
+      // user.setName(result.email)
+      // await CometChat.createUser(user, process.env.AUTH_KEY_COSMO_CHAT!).then(
+      //   (user: CometChat.User) => {
+      //     console.log('user created', user)
+      //   },
+      //   (error: CometChat.CometChatException) => {
+      //     console.log('error', error)
+      //     throw error
+      //   }
+      // )
 
       return res.status(200).send({
         token: jwtToken
